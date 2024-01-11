@@ -1,4 +1,4 @@
-//todo EVENTS
+//todo EVENTS - lecture
 //admin panel as example - event user bought something
 const Events = require('events');
 
