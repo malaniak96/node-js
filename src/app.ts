@@ -27,6 +27,7 @@ app.use(
 const PORT = configs.PORT;
 
 app.listen(PORT, async () => {
+  console.log(configs.DB_URL);
   await mongoose.connect(configs.DB_URL);
   console.log(`Server has started on PORT ${PORT}`);
 });
