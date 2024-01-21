@@ -16,6 +16,7 @@ app.use("/users", userRouter);
 
 app.use(
   "*",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   (err: ApiError, req: Request, res: Response, next: NextFunction) => {
     return res.status(err.status).json({
       message: err.message,

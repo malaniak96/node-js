@@ -1,10 +1,10 @@
 import * as jwt from "jsonwebtoken";
-import { Types } from "mongoose";
 
 import { configs } from "../configs/config";
+import { ApiError } from "../errors/api.error";
 
 export interface ITokenPayload {
-  userId: Types.ObjectId;
+  userId: string;
 }
 
 export interface ITokensPair {
@@ -24,6 +24,23 @@ class TokenService {
       accessToken,
       refreshToken,
     };
+  }
+
+  public checkToken(token: string, type: "refresh" | "access"): ITokenPayload {
+    try {
+      let secret: string;
+      switch (type) {
+        case "access":
+          secret = configs.JWT_ACCESS_SECRET;
+          break;
+        case "refresh":
+          secret = configs.JWT_REFRESH_SECRET;
+          break;
+      }
+      return jwt.verify(token, secret) as ITokenPayload;
+    } catch (e) {
+      throw new ApiError("Token is invalid", 401);
+    }
   }
 }
 
