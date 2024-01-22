@@ -1,16 +1,44 @@
 import { Types } from "mongoose";
 
+import { EEmailAction } from "../enums/email-actions.enum";
 import { ApiError } from "../errors/api.error";
 import { ILogin } from "../interfaces/auth.interface";
 import { IUser } from "../interfaces/user.interface";
 import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
+import { emailService } from "./email.service";
 import { passwordService } from "./password.service";
 import { ITokenPayload, ITokensPair, tokenService } from "./token.service";
 
 class AuthService {
   public async signUp(dto: Partial<IUser>): Promise<IUser> {
+    const userFromDb = await userRepository.getOneByParams({
+      email: dto.email,
+    });
+
+    if (userFromDb) {
+      throw new ApiError("User with provided email already exists", 400);
+    }
+
     const hashedPassword = await passwordService.hash(dto.password);
+
+    // const users = await userRepository.getAll();
+    //
+    // await Promise.all(
+    //   users.map(async (user) => {
+    //     await emailService.sendMail(user.email, EEmailAction.WELCOME, {
+    //       name: user.name,
+    //     });
+    //   }),
+    // );
+
+    // await emailService.sendMail(dto.email);
+    await emailService.sendMail(dto.email, EEmailAction.WELCOME, {
+      name: dto.name,
+    });
+    //if an array of emails -
+    // await emailService.sendMail(["malaniako@gmail.com", "katya@gmail.com"], EEmailAction.WELCOME);
+
     return await userRepository.create({ ...dto, password: hashedPassword });
   }
   public async signIn(dto: ILogin): Promise<ITokensPair> {
