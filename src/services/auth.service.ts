@@ -1,12 +1,10 @@
 import { Types } from "mongoose";
 
-import { EEmailAction } from "../enums/email-actions.enum";
 import { ApiError } from "../errors/api.error";
 import { ILogin } from "../interfaces/auth.interface";
 import { IUser } from "../interfaces/user.interface";
 import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
-import { emailService } from "./email.service";
 import { passwordService } from "./password.service";
 import { ITokenPayload, ITokensPair, tokenService } from "./token.service";
 
@@ -33,9 +31,13 @@ class AuthService {
     // );
 
     // await emailService.sendMail(dto.email);
-    await emailService.sendMail(dto.email, EEmailAction.WELCOME, {
-      name: dto.name,
-    });
+
+    //todo
+    // await emailService.sendMail(dto.email, EEmailAction.WELCOME, {
+    //   name: dto.name,
+    // });
+    //todo for joi to work otherwise uncomment
+
     //if an array of emails -
     // await emailService.sendMail(["malaniako@gmail.com", "katya@gmail.com"], EEmailAction.WELCOME);
 
