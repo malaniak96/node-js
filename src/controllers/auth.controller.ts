@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 
 import { ILogin } from "../interfaces/auth.interface";
+import { ITokenPayload } from "../interfaces/token.interface";
 import { IUser } from "../interfaces/user.interface";
 import { authService } from "../services/auth.service";
-import { ITokenPayload } from "../services/token.service";
 
 class AuthController {
   public async signUp(req: Request, res: Response, next: NextFunction) {
@@ -55,6 +55,35 @@ class AuthController {
       const jwtTokens = await authService.refresh(jwtPayload, refreshToken);
 
       return res.json({ data: jwtTokens });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = req.res.locals as IUser;
+
+      await authService.forgotPassword(user);
+
+      return res.json("ok");
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async setForgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const token = req.params.token;
+      const newPassword = req.body.newPassword;
+
+      await authService.setForgotPassword(newPassword, token);
+
+      return res.json("ok");
     } catch (e) {
       next(e);
     }

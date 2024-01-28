@@ -1,13 +1,17 @@
 import { Types } from "mongoose";
 
+import { EEmailAction } from "../enums/email-actions.enum";
 import { ERole } from "../enums/role.enum";
+import { EActionTokenType } from "../enums/token-type.enum";
 import { ApiError } from "../errors/api.error";
 import { ILogin } from "../interfaces/auth.interface";
+import { ITokenPayload, ITokensPair } from "../interfaces/token.interface";
 import { IUser } from "../interfaces/user.interface";
 import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
+import { emailService } from "./email.service";
 import { passwordService } from "./password.service";
-import { ITokenPayload, ITokensPair, tokenService } from "./token.service";
+import { tokenService } from "./token.service";
 
 class AuthService {
   public async signUpAdmin(dto: Partial<IUser>): Promise<IUser> {
@@ -138,6 +142,48 @@ class AuthService {
     });
 
     return jwtTokens;
+  }
+
+  public async forgotPassword(user: IUser) {
+    const actionToken = tokenService.createActionToken(
+      {
+        userId: user._id,
+        role: ERole.USER,
+      },
+      EActionTokenType.FORGOT,
+    );
+    await Promise.all([
+      tokenRepository.createActionToken({
+        actionToken,
+        _userId: user._id,
+        tokenType: EActionTokenType.FORGOT,
+      }),
+      emailService.sendMail(user.email, EEmailAction.FORGOT_PASSWORD, {
+        actionToken,
+      }),
+    ]);
+  }
+
+  public async setForgotPassword(password: string, actionToken: string) {
+    const payload = tokenService.checkActionToken(
+      actionToken,
+      EActionTokenType.FORGOT,
+    );
+    const entity = await tokenRepository.getActionTokenByParams({
+      actionToken,
+    });
+    if (!entity) {
+      throw new ApiError("Token not valid", 400);
+    }
+
+    const newHashedPassword = await passwordService.hash(password);
+
+    await Promise.all([
+      await userRepository.updateById(payload.userId, {
+        password: newHashedPassword,
+      }),
+      tokenRepository.deleteActionTokenByParams({ actionToken }),
+    ]);
   }
 }
 export const authService = new AuthService();

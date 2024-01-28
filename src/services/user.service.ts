@@ -1,7 +1,7 @@
 import { ApiError } from "../errors/api.error";
+import { ITokenPayload } from "../interfaces/token.interface";
 import { IUser } from "../interfaces/user.interface";
 import { userRepository } from "../repositories/user.repository";
-import { ITokenPayload } from "./token.service";
 
 class UserService {
   public async getAll(): Promise<IUser[]> {

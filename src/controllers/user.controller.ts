@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
+import { ITokenPayload } from "../interfaces/token.interface";
 import { IUser } from "../interfaces/user.interface";
-import { ITokenPayload } from "../services/token.service";
 import { userService } from "../services/user.service";
 
 class UserController {
