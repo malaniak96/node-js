@@ -31,6 +31,10 @@ const userSchema = new Schema(
       enum: ERole,
       default: ERole.USER,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

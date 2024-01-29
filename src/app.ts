@@ -2,7 +2,9 @@ import express, { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 
 import { configs } from "./configs/config";
+import { ERole } from "./enums/role.enum";
 import { ApiError } from "./errors/api.error";
+import { userRepository } from "./repositories/user.repository";
 import { adminRouter } from "./routers/admin.router";
 import { authRouter } from "./routers/auth.router";
 import { userRouter } from "./routers/user.router";
@@ -32,5 +34,14 @@ const PORT = configs.PORT;
 app.listen(PORT, async () => {
   console.log(configs.DB_URL);
   await mongoose.connect(configs.DB_URL);
+
+  const user = await userRepository.getOneByParams({});
+  if (!user) {
+    await userRepository.create({
+      role: ERole.SUPER_ADMIN,
+      email: "super_admin@gmail.com",
+    });
+  }
+
   console.log(`Server has started on PORT ${PORT}`);
 });

@@ -49,4 +49,5 @@ router.put(
   authController.setForgotPassword,
 );
 
+router.put("/verify/:token", authController.verify);
 export const authRouter = router;
