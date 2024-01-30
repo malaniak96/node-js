@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { ILogin } from "../interfaces/auth.interface";
+import { IChangePassword, ILogin } from "../interfaces/auth.interface";
 import { ITokenPayload } from "../interfaces/token.interface";
 import { IUser } from "../interfaces/user.interface";
 import { authService } from "../services/auth.service";
@@ -66,7 +66,7 @@ class AuthController {
 
       await authService.forgotPassword(user);
 
-      return res.json("ok");
+      return res.sendStatus(204);
     } catch (e) {
       next(e);
     }
@@ -83,7 +83,7 @@ class AuthController {
 
       await authService.setForgotPassword(newPassword, token);
 
-      return res.json("ok");
+      return res.sendStatus(204);
     } catch (e) {
       next(e);
     }
@@ -95,7 +95,21 @@ class AuthController {
 
       await authService.verify(token);
 
-      return res.json("ok");
+      return res.sendStatus(204);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async changePassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
+
+      const body = req.body as IChangePassword;
+
+      await authService.changePassword(body, jwtPayload);
+
+      return res.sendStatus(204);
     } catch (e) {
       next(e);
     }

@@ -4,7 +4,7 @@ import { EEmailAction } from "../enums/email-actions.enum";
 import { ERole } from "../enums/role.enum";
 import { EActionTokenType } from "../enums/token-type.enum";
 import { ApiError } from "../errors/api.error";
-import { ILogin } from "../interfaces/auth.interface";
+import { IChangePassword, ILogin } from "../interfaces/auth.interface";
 import { ITokenPayload, ITokensPair } from "../interfaces/token.interface";
 import { IUser } from "../interfaces/user.interface";
 import { tokenRepository } from "../repositories/token.repository";
@@ -206,6 +206,26 @@ class AuthService {
       await userRepository.updateById(payload.userId, { isVerified: true }),
       tokenRepository.deleteActionTokenByParams({ actionToken }),
     ]);
+  }
+
+  //dto = data transfer object
+  public async changePassword(dto: IChangePassword, jwtPayload: ITokenPayload) {
+    const user = await userRepository.getById(jwtPayload.userId);
+    if (!user) {
+      throw new ApiError("User not found", 404);
+    }
+
+    const isMatch = await passwordService.compare(
+      dto.oldPassword,
+      user.password,
+    );
+    if (!isMatch) {
+      throw new ApiError("Old password is invalid", 400);
+    }
+
+    const hashedNewPassword = await passwordService.hash(dto.newPassword);
+
+    await userRepository.updateById(user._id, { password: hashedNewPassword });
   }
 }
 export const authService = new AuthService();
