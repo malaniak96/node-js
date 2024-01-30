@@ -3,4 +3,5 @@ export enum EEmailAction {
   WELCOME,
   // eslint-disable-next-line no-unused-vars
   FORGOT_PASSWORD,
+  OLD_VISIT,
 }
