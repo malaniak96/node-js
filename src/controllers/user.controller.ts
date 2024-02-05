@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { ITokenPayload } from "../interfaces/token.interface";
 import { IUser } from "../interfaces/user.interface";
+import { UserPresenter } from "../presenters/user.presenter";
 import { userService } from "../services/user.service";
 
 class UserController {
@@ -31,7 +32,7 @@ class UserController {
 
       const user = await userService.getMe(jwtPayload);
 
-      res.json({ data: user });
+      res.json({ data: UserPresenter.userToResponse(user) });
     } catch (e) {
       next(e);
     }

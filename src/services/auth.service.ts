@@ -98,7 +98,9 @@ class AuthService {
     return user;
   }
   public async signIn(dto: ILogin): Promise<ITokensPair> {
-    const user = await userRepository.getOneByParams({ email: dto.email });
+    const user = await userRepository.getOneByParamsWithPassword({
+      email: dto.email,
+    });
 
     if (!user) {
       throw new ApiError("Not valid email or password", 401);
