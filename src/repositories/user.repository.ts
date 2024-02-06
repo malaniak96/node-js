@@ -1,5 +1,9 @@
 import { FilterQuery } from "mongoose";
 
+import {
+  IPaginationResponse,
+  IQuery,
+} from "../interfaces/pagination.interface";
 import { IUser } from "../interfaces/user.interface";
 import { Token } from "../models/token.model";
 import { User } from "../models/user.model";
@@ -59,6 +63,31 @@ class UserRepository {
         },
       },
     ]);
+  }
+
+  public async getMany(query: IQuery): Promise<IPaginationResponse<IUser>> {
+    const {
+      page = 1,
+      limit = 10,
+      sortedBy = "createdAt",
+      ...searchObject
+    } = query;
+
+    const skip = +limit * (+page - 1);
+
+    const users = await User.find(searchObject)
+      .sort(sortedBy)
+      .limit(limit)
+      .skip(skip);
+
+    const itemsFound = await User.countDocuments(searchObject);
+
+    return {
+      page: +page,
+      limit: +limit,
+      itemsFound,
+      data: users,
+    };
   }
 }
 export const userRepository = new UserRepository();

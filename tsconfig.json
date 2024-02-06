@@ -9,6 +9,7 @@
     "allowSyntheticDefaultImports": true,
     "removeComments": true,
     "noUnusedLocals": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
   }
 }

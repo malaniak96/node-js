@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
+import { IQuery } from "../interfaces/pagination.interface";
 import { ITokenPayload } from "../interfaces/token.interface";
 import { IUser } from "../interfaces/user.interface";
 import { UserPresenter } from "../presenters/user.presenter";
@@ -14,6 +15,24 @@ class UserController {
       next(e);
     }
   }
+
+  public async getAllPaginated(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const usersPaginated = await userService.getMany(req.query as IQuery);
+      const presentedUsers = usersPaginated.data.map((user) =>
+        UserPresenter.userToResponse(user),
+      );
+
+      return res.json({ ...usersPaginated, data: presentedUsers });
+    } catch (e) {
+      next(e);
+    }
+  }
+
   public async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const id = req.params.id;
