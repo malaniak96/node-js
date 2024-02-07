@@ -9,6 +9,7 @@ export class UserPresenter {
       isVerified: user.isVerified,
       role: user.role,
       createdAt: user.createdAt,
+      phone: user.phone,
     };
   }
 }

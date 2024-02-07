@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { IChangePassword, ILogin } from "../interfaces/auth.interface";
 import { ITokenPayload } from "../interfaces/token.interface";
 import { IUser } from "../interfaces/user.interface";
+import { UserPresenter } from "../presenters/user.presenter";
 import { authService } from "../services/auth.service";
 
 class AuthController {
@@ -11,7 +12,7 @@ class AuthController {
       const body = req.body as Partial<IUser>;
       const createdUser = await authService.signUp(body);
 
-      return res.json({ data: createdUser });
+      return res.json({ data: UserPresenter.userToResponse(createdUser) });
     } catch (e) {
       next(e);
     }

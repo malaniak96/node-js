@@ -11,6 +11,7 @@ import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
 import { emailService } from "./email.service";
 import { passwordService } from "./password.service";
+import { prepareSmsService } from "./prepare-sms.service";
 import { tokenService } from "./token.service";
 
 class AuthService {
@@ -93,6 +94,7 @@ class AuthService {
         name: dto.name,
         actionToken,
       }),
+      prepareSmsService.register(dto.phone, { name: dto.name }),
     ]);
 
     return user;
