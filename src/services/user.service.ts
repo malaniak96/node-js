@@ -1,9 +1,12 @@
+import { UploadedFile } from "express-fileupload";
+
 import { ApiError } from "../errors/api.error";
 import { IQuery } from "../interfaces/pagination.interface";
 import { ITokenPayload } from "../interfaces/token.interface";
 import { IUser } from "../interfaces/user.interface";
 import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
+import { EFileType, s3Service } from "./s3.service";
 
 class UserService {
   public async getAll(): Promise<IUser[]> {
@@ -57,6 +60,20 @@ class UserService {
     const usersPaginated = await userRepository.getMany(queryObject);
 
     return usersPaginated;
+  }
+  public async uploadAvatar(userId: string, avatar: UploadedFile) {
+    const user = await userRepository.getById(userId);
+    if (!user) {
+      throw new ApiError("User with provided id not found", 400);
+    }
+
+    if (user.avatar) {
+      //todo remove old avatar
+      //check for command how to delete avatar
+    }
+    const filePath = await s3Service.uploadFile(avatar, EFileType.User, userId);
+
+    await userRepository.updateById(userId, { avatar: filePath });
   }
 }
 export const userService = new UserService();

@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { UploadedFile } from "express-fileupload";
 
 import { IQuery } from "../interfaces/pagination.interface";
 import { ITokenPayload } from "../interfaces/token.interface";
@@ -77,6 +78,16 @@ class UserController {
       await userService.deleteMe(jwtPayload);
 
       res.sendStatus(204);
+    } catch (e) {
+      next(e);
+    }
+  }
+  public async uploadAvatar(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId } = req.params;
+      await userService.uploadAvatar(userId, req.files.avatar as UploadedFile);
+
+      res.json("ok");
     } catch (e) {
       next(e);
     }
