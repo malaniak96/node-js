@@ -1,4 +1,8 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import { UploadedFile } from "express-fileupload";
 import path from "path";
 
@@ -38,6 +42,15 @@ class S3Service {
     );
 
     return filePath;
+  }
+
+  public async deleteFile(filePath: string): Promise<void> {
+    await this.client.send(
+      new DeleteObjectCommand({
+        Key: filePath,
+        Bucket: configs.AWS_S3_BUCKET_NAME,
+      }),
+    );
   }
 
   private buildFilePath(itemType: EFileType, itemId: string, fileName: string) {
